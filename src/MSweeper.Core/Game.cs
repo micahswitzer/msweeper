@@ -37,17 +37,27 @@ namespace MSweeper.Core
             CreateMines();
         }
 
-        public bool RevealTile(TilePosition tile)
+        public RevealResult RevealTile(TilePosition tile)
         {
-            if (_revealed[tile.X, tile.Y] != -1) return false;
+            // we've already revealed this tile
+            if (_revealed[tile.X, tile.Y] != -1)
+                return RevealResult.NoChange;
+            // check if the player selected a mine
             GameFinished = _mines.Contains(tile);
-            if (GameFinished) return true;
+            // if so, the game is over and they lost
+            if (GameFinished) return RevealResult.GameLost;
+            // otherwise, reveal this tile
             var initialCount = AdjacentCount(tile);
             _revealed[tile.X, tile.Y] = initialCount;
+            // we now need one fewer tiles to be revealed to win the game
             _remainingTiles--;
             GameFinished = _remainingTiles == 0;
-            if (GameFinished) GameWon = true;
-            if (initialCount != 0) return false;
+            if (GameFinished)
+            {
+                GameWon = true;
+                return RevealResult.GameWon;
+            }
+            if (initialCount != 0) return RevealResult.Ok;
             for (int x = -1; x <= 1; x++)
             for (int y = -1; y <= 1; y++)
             {
@@ -59,7 +69,7 @@ namespace MSweeper.Core
                     RevealTile(new TilePosition(newX, newY));
                 }
             }
-            return false;
+            return RevealResult.Ok;
         }
 
         private byte AdjacentCount(TilePosition tile)

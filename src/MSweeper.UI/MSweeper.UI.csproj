@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MSweeper.Core\MSweeper.Core.csproj" />
+    <ProjectReference Include="..\MSweeper.AI\MSweeper.AI.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
